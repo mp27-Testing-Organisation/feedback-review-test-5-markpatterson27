@@ -1,0 +1,17 @@
+name: Assign GitHub Classroom graders
+on:
+  pull_request:
+    types: [opened]
+    branches: [feedback]
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          gh api -X POST repos/${{ github.event.organization.login }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers -f reviewers[]=markpatterson27
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          gh api -X PATCH repos/${{ github.event.organization.login }}/${{ github.event.repository.name }}/branches/feedback/protection -F required_pull_request_reviews[required_approving_review_count]=1 -F required_conversation_resolution=true -F enforce_admins=null -F required_status_checks=null -F restrictions=null
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
